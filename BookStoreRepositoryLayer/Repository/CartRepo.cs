@@ -79,7 +79,7 @@ namespace BookStoreRepositoryLayer.Repository
             }
         }
 
-        public Cart DeleteCart(Cart cart)
+        public int DeleteCart(int cartId, int userId)
         {
             try
             {
@@ -87,13 +87,11 @@ namespace BookStoreRepositoryLayer.Repository
                 {
                     SqlCommand command = new SqlCommand("spDeleteCart", this.connection);
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@CartId", cart.CartId);
-                    command.Parameters.AddWithValue("@UserId", cart.UserId);
+                    command.Parameters.AddWithValue("@CartId", cartId);
+                    command.Parameters.AddWithValue("@UserId", userId);
                     this.connection.Open();
                     int result = command.ExecuteNonQuery();
-                    if (result != 0)
-                        return cart;
-                    return null;
+                    return cartId;
                 }
             }
             catch(Exception e)
@@ -103,6 +101,43 @@ namespace BookStoreRepositoryLayer.Repository
             finally
             {
                 this.connection.Close();
+            }
+        }
+
+        public List<CartResponse> GetAllCart(int userId)
+        {
+            try
+            {
+                using (this.connection)
+                {
+                    SqlCommand command = new SqlCommand("spGetAllCart", this.connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    List<CartResponse> cartRsponse = new List<CartResponse>();
+                    CartResponse cart = new CartResponse();
+                    this.connection.Open();
+                    SqlDataReader dataReader = command.ExecuteReader();
+                    while (dataReader.Read())
+                    {
+                        if (dataReader != null)
+                        {
+                            cart.CartId = (int)dataReader["CartId"];
+                            cart.BookQuantity = (int)dataReader["BookQuanity"];
+                            cart.UserId = (int)dataReader["UserId"];
+                            cart.BookName = dataReader["BookName"].ToString();
+                            cart.BookAutherName = dataReader["BookAutherName"].ToString();
+                            cart.BookPrice = (int)dataReader["BookPrice"];
+                            cart.BookImage = dataReader["BookImage"].ToString();
+                            cartRsponse.Add(cart);
+                            break;
+                        }
+                    }
+                    return cartRsponse;
+                }
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

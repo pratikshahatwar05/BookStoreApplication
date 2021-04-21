@@ -5,10 +5,9 @@ using System.Text;
 
 namespace BookStoreManagerLayer.IManager
 {
-    public interface IUserManager
+    public interface IOrderplaceManager
     {
-        Users RegisterUser(Users user);
-        string LoginUser(LoginModel user);
-        List<Users> GetAllUsers();
+        PlaceOrder OrderPlaced(PlaceOrder placeOrder);
+        List<PlaceOrderResponse> GetOrderPlace(int userId);
     }
 }

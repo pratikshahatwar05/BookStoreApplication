@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BookStoreRepositoryLayer.IRepository
+namespace BookStoreManagerLayer.IManager
 {
-    public interface IBookRepo
+    public interface IBookManager
     {
         Book AddBook(Book book);
         Book UpdateBook(Book book);

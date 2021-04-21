@@ -7,18 +7,18 @@ using System.Text;
 
 namespace BookStoreManagerLayer.Manager
 {
-    public class UserManager : IUserManager
+    public class CartManager : ICartManager
     {
-        private readonly IUserRepo userRepo;
-        public UserManager(IUserRepo userRepo)
+        private readonly ICartRepo cartRepo;
+        public CartManager(ICartRepo cartRepo)
         {
-            this.userRepo = userRepo;
+            this.cartRepo = cartRepo;
         }
-        public List<Users> GetAllUsers()
+        public Cart AddCart(Cart cart)
         {
             try
             {
-                return this.userRepo.GetAllUsers();
+               return this.cartRepo.AddCart(cart);
             }
             catch(Exception e)
             {
@@ -26,11 +26,11 @@ namespace BookStoreManagerLayer.Manager
             }
         }
 
-        public string LoginUser(LoginModel loginModel)
+        public int DeleteCart(int cartId, int userId)
         {
             try
             {
-                return this.userRepo.LoginUser(loginModel);
+                return this.cartRepo.DeleteCart(cartId,userId);
             }
             catch (Exception e)
             {
@@ -38,11 +38,23 @@ namespace BookStoreManagerLayer.Manager
             }
         }
 
-        public Users RegisterUser(Users user)
+        public List<CartResponse> GetAllCart(int userId)
         {
             try
             {
-                return this.userRepo.RegisterUser(user);
+                return this.cartRepo.GetAllCart(userId);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public Cart UpdateCart(Cart cart)
+        {
+            try
+            {
+                return this.cartRepo.UpdateCart(cart);
             }
             catch (Exception e)
             {

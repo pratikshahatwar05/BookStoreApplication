@@ -8,6 +8,8 @@ namespace BookStoreRepositoryLayer.IRepository
     public interface IUserRepo
     {
         Users RegisterUser(Users user);
+        string LoginUser(LoginModel user);
         List<Users> GetAllUsers();
+        //string LoginModel(LoginModel loginModel);
     }
 }

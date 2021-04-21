@@ -7,30 +7,18 @@ using System.Text;
 
 namespace BookStoreManagerLayer.Manager
 {
-    public class UserManager : IUserManager
+    public class WishlistManager : IWishlistManager
     {
-        private readonly IUserRepo userRepo;
-        public UserManager(IUserRepo userRepo)
+        private readonly IWishlistRepo wishlistRepo;
+        public WishlistManager(IWishlistRepo wishlistRepo)
         {
-            this.userRepo = userRepo;
+            this.wishlistRepo = wishlistRepo;
         }
-        public List<Users> GetAllUsers()
+        public Wishlist AddWishlist(Wishlist wishlist)
         {
             try
             {
-                return this.userRepo.GetAllUsers();
-            }
-            catch(Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
-
-        public string LoginUser(LoginModel loginModel)
-        {
-            try
-            {
-                return this.userRepo.LoginUser(loginModel);
+                return this.wishlistRepo.AddWishlist(wishlist);
             }
             catch (Exception e)
             {
@@ -38,11 +26,23 @@ namespace BookStoreManagerLayer.Manager
             }
         }
 
-        public Users RegisterUser(Users user)
+        public int DeleteWishlist(int userId, int bookId)
         {
             try
             {
-                return this.userRepo.RegisterUser(user);
+                return this.wishlistRepo.DeleteWishlist(userId,bookId);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public List<WishlistResponse> GetAllWishlist(int userId)
+        {
+            try
+            {
+                return this.wishlistRepo.GetAllWishlist(userId);
             }
             catch (Exception e)
             {

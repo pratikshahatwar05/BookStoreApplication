@@ -7,18 +7,18 @@ using System.Text;
 
 namespace BookStoreManagerLayer.Manager
 {
-    public class UserManager : IUserManager
+    public class BookManager : IBookManager
     {
-        private readonly IUserRepo userRepo;
-        public UserManager(IUserRepo userRepo)
+        private readonly IBookRepo bookRepo;
+        public BookManager(IBookRepo bookRepo)
         {
-            this.userRepo = userRepo;
+            this.bookRepo = bookRepo;
         }
-        public List<Users> GetAllUsers()
+        public Book AddBook(Book book)
         {
             try
             {
-                return this.userRepo.GetAllUsers();
+                return this.bookRepo.AddBook(book);
             }
             catch(Exception e)
             {
@@ -26,11 +26,11 @@ namespace BookStoreManagerLayer.Manager
             }
         }
 
-        public string LoginUser(LoginModel loginModel)
+        public int DeleteBook(int bookId)
         {
             try
             {
-                return this.userRepo.LoginUser(loginModel);
+                return this.bookRepo.DeleteBook(bookId);
             }
             catch (Exception e)
             {
@@ -38,11 +38,23 @@ namespace BookStoreManagerLayer.Manager
             }
         }
 
-        public Users RegisterUser(Users user)
+        public List<Book> GetAllBook()
         {
             try
             {
-                return this.userRepo.RegisterUser(user);
+                return this.bookRepo.GetAllBook();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public Book UpdateBook(Book book)
+        {
+            try
+            {
+                return this.bookRepo.UpdateBook(book);
             }
             catch (Exception e)
             {

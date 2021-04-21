@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BookStoreRepositoryLayer.IRepository
+namespace BookStoreManagerLayer.IManager
 {
-    public interface ICartRepo
+    public interface ICartManager
     {
         Cart AddCart(Cart cart);
         Cart UpdateCart(Cart cart);

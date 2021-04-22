@@ -28,18 +28,6 @@ namespace BookStoreManagerLayer.Manager
             }
         }
 
-        public List<OrderDeliverResponse> GetOrderDelivered(int userId)
-        {
-            try
-            {
-                return this.orderDeliveredRepo.GetOrderDelivered(userId);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
-
         public OrderDelivered OrderDeliver(OrderDelivered orderDelivered)
         {
             try

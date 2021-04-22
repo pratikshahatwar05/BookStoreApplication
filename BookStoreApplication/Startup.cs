@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BookStoreManagerLayer.IManager;
 using BookStoreManagerLayer.Manager;
 using BookStoreRepositoryLayer.IRepository;
+using BookStoreRepositoryLayer.MSMQ;
 using BookStoreRepositoryLayer.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -48,6 +49,7 @@ namespace BookStoreApplication
             services.AddTransient<IOrderplaceManager, OrderplaceManager>();
             services.AddTransient<IOrderDeliveredRepo, OrderDeliveredRepo>();
             services.AddTransient<IOrderDeliverManager, OrderDeliverManager>();
+            services.AddTransient<IMSMQService, MSMQService>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Book Store App", Version = "v1", Description = "Book Store Application" });

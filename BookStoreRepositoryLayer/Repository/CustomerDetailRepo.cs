@@ -1,6 +1,8 @@
 ﻿using BookStoreModelLayer;
 using BookStoreRepositoryLayer.IRepository;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,12 +16,16 @@ namespace BookStoreRepositoryLayer.Repository
         private readonly string connectionString;
         private readonly SqlConnection connection;
         private readonly IConfiguration configuration;
+        private readonly IDistributedCache cache;
+        private readonly string cacheKey;
 
-        public CustomerDetailRepo(IConfiguration configuration)
+        public CustomerDetailRepo(IConfiguration configuration, IDistributedCache cache)
         {
             this.configuration = configuration;
             this.connectionString = configuration.GetConnectionString("UserDbConnection");
             this.connection = new SqlConnection(this.connectionString);
+            this.cache = cache;
+            this.cacheKey = "CustomerDetail";
         }
 
         public CustomerDetail AddCustomerDetail(CustomerDetail detail)
@@ -60,34 +66,46 @@ namespace BookStoreRepositoryLayer.Repository
         {
             try
             {
-                using (this.connection)
+                if (this.cache.GetString(cacheKey) != null)
                 {
-                    SqlCommand command = new SqlCommand("spGetAllCustomerDetail", this.connection);
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@UserId", userId);
-                    List<CustomerDetail> details = new List<CustomerDetail>();
-                    CustomerDetail detail = new CustomerDetail();
-                    this.connection.Open();
-                    SqlDataReader dataReader = command.ExecuteReader();
-                    while (dataReader.Read())
+                    var data = JsonConvert.DeserializeObject<List<CustomerDetail>>(this.cache.GetString(cacheKey));
+                    return data;
+                }
+                else
+                {
+                    using (this.connection)
                     {
-                        if (dataReader != null)
+                        SqlCommand command = new SqlCommand("spGetAllCustomerDetail", this.connection);
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@UserId", userId);
+                        List<CustomerDetail> details = new List<CustomerDetail>();
+                        CustomerDetail detail = new CustomerDetail();
+                        this.connection.Open();
+                        SqlDataReader dataReader = command.ExecuteReader();
+                        while (dataReader.Read())
                         {
-                            detail.CustomerId = (int)dataReader["CustomerId"];
-                            detail.UserId = (int)dataReader["UserId"];
-                            detail.CustomerDetailTypeId = (int)dataReader["CustomerDetailTypeId"];
-                            detail.Name = dataReader["Name"].ToString();
-                            detail.PhoneNumber = dataReader["PhoneNumber"].ToString();
-                            detail.Pincode = dataReader["Pincode"].ToString();
-                            detail.Locality = dataReader["Locality"].ToString();
-                            detail.Address = dataReader["Address"].ToString();
-                            detail.City = dataReader["City"].ToString();
-                            detail.Landmark = dataReader["Landmark"].ToString();
-                            details.Add(detail);
-                            break;
+                            if (dataReader != null)
+                            {
+                                detail.CustomerId = (int)dataReader["CustomerId"];
+                                detail.UserId = (int)dataReader["UserId"];
+                                detail.CustomerDetailTypeId = (int)dataReader["CustomerDetailTypeId"];
+                                detail.Name = dataReader["Name"].ToString();
+                                detail.PhoneNumber = dataReader["PhoneNumber"].ToString();
+                                detail.Pincode = dataReader["Pincode"].ToString();
+                                detail.Locality = dataReader["Locality"].ToString();
+                                detail.Address = dataReader["Address"].ToString();
+                                detail.City = dataReader["City"].ToString();
+                                detail.Landmark = dataReader["Landmark"].ToString();
+                                details.Add(detail);
+                                break;
+                            }
                         }
+                        if (details != null)
+                        {
+                            this.cache.SetString(this.cacheKey, JsonConvert.SerializeObject(details));
+                        }
+                        return details;
                     }
-                    return details;
                 }
             }
             catch(Exception e)

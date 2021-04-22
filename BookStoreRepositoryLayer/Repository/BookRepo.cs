@@ -65,34 +65,23 @@ namespace BookStoreRepositoryLayer.Repository
         {
             try
             {
-                if (this.cache.GetString(cacheKey) != null)
+                using (this.connection)
                 {
-                    var data = JsonConvert.DeserializeObject<Book>(this.cache.GetString(cacheKey));
-                    return data;
-                }
-                else
-                {
-                    using (this.connection)
-                    {
-                        SqlCommand command = new SqlCommand("sp_update_book", this.connection);
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@BookId", book.BookId);
-                        command.Parameters.AddWithValue("@BookName", book.BookName);
-                        command.Parameters.AddWithValue("@BookAutherName", book.BookAutherName);
-                        command.Parameters.AddWithValue("@BookPrice", book.BookPrice);
-                        command.Parameters.AddWithValue("@BookImage", book.BookImage);
-                        command.Parameters.AddWithValue("@BookDescription", book.BookDescription);
-                        command.Parameters.AddWithValue("@BookQuantity", book.BookQuantity);
-                        this.connection.Open();
-                        int result = command.ExecuteNonQuery();
+                     SqlCommand command = new SqlCommand("sp_update_book", this.connection);
+                     command.CommandType = CommandType.StoredProcedure;
+                     command.Parameters.AddWithValue("@BookId", book.BookId);
+                     command.Parameters.AddWithValue("@BookName", book.BookName);
+                     command.Parameters.AddWithValue("@BookAutherName", book.BookAutherName);
+                     command.Parameters.AddWithValue("@BookPrice", book.BookPrice);
+                     command.Parameters.AddWithValue("@BookImage", book.BookImage);
+                     command.Parameters.AddWithValue("@BookDescription", book.BookDescription);
+                     command.Parameters.AddWithValue("@BookQuantity", book.BookQuantity);
+                     this.connection.Open();
+                     int result = command.ExecuteNonQuery();
                         
-                        if (result != 0)
-                        {
-                            this.cache.SetString(this.cacheKey, JsonConvert.SerializeObject(book));
-                            return book;
-                        }     
-                        return null;
-                    }
+                     if (result != 0)   
+                      return book;    
+                     return null;
                 }
             }
             catch (Exception e)

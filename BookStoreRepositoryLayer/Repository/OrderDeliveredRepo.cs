@@ -22,51 +22,6 @@ namespace BookStoreRepositoryLayer.Repository
             this.connection = new SqlConnection(this.connectionString);
         }
 
-        public List<OrderDeliverResponse> GetOrderDelivered(int userId)
-        {
-            try
-            {
-                using (this.connection)
-                {
-                    SqlCommand command = new SqlCommand("spGetOrderDelivered", this.connection);
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@UserId", userId);
-                    List<OrderDeliverResponse> dileveredRsponse = new List<OrderDeliverResponse>();
-                    OrderDeliverResponse deliverorder = new OrderDeliverResponse();
-                    this.connection.Open();
-                    SqlDataReader dataReader = command.ExecuteReader();
-                    while (dataReader.Read())
-                    {
-                        if (dataReader != null)
-                        {
-                            deliverorder.OrderDeliverId = (int)dataReader["OrderDeliverId"];
-                            deliverorder.BookId = (int)dataReader["BookId"];
-                            deliverorder.BookName = dataReader["BookName"].ToString();
-                            deliverorder.BookAutherName = dataReader["BookAutherName"].ToString();
-                            deliverorder.BookPrice = (int)dataReader["BookPrice"];
-                            deliverorder.BookImage = dataReader["BookImage"].ToString();
-                            deliverorder.CustomerId = (int)dataReader["CustomerId"];
-                            deliverorder.Name = dataReader["Name"].ToString();
-                            deliverorder.PhoneNumber = dataReader["PhoneNumber"].ToString();
-                            deliverorder.Address = dataReader["Address"].ToString();
-                            deliverorder.City = dataReader["City"].ToString();
-                            dileveredRsponse.Add(deliverorder);
-                            break;
-                        }
-                    }
-                    return dileveredRsponse;
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-            finally
-            {
-                this.connection.Close();
-            }
-        }
-
         public OrderDelivered UpdateDeliveryStatus(OrderDelivered orderDelivered)
         {
             try

@@ -22,25 +22,6 @@ namespace BookStoreApplication.Controllers
             this.orderDeliverManager = orderDeliverManager;
         }
 
-        [HttpGet]
-        public IActionResult GetOrderDelivered()
-        {
-            try
-            {
-                var userId = TokenUserId();
-                var result = this.orderDeliverManager.GetOrderDelivered(userId);
-                if (result != null)
-                {
-                    return this.Ok(new { Status = true, Message = "Order delivered Successfully", Data = result });
-                }
-                return this.BadRequest(new { Status = true, Message = "Unable to delivered order" });
-            }
-            catch (Exception e)
-            {
-                return this.BadRequest(new { Status = false, Message = e.Message });
-            }
-        }
-
         [HttpPost]
         public IActionResult OrderDeliver(OrderDelivered orderDelivered)
         {

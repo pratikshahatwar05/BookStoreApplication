@@ -28,7 +28,7 @@ namespace BookStoreRepositoryLayer.Repository
         {
             try
             {
-                var password =  Encryptdata(user.Password);
+                var password = Encryptdata(user.Password);
                 using (this.connection)
                 {
                     SqlCommand command = new SqlCommand("AddUsers", this.connection);

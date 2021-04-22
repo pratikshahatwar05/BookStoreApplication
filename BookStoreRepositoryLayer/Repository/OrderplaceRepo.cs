@@ -1,5 +1,6 @@
 ﻿using BookStoreModelLayer;
 using BookStoreRepositoryLayer.IRepository;
+using BookStoreRepositoryLayer.MSMQ;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -14,12 +15,14 @@ namespace BookStoreRepositoryLayer.Repository
         private readonly string connectionString;
         private readonly SqlConnection connection;
         private readonly IConfiguration configuration;
+        private readonly IMSMQService mSMQService;
 
-        public OrderplaceRepo(IConfiguration configuration)
+        public OrderplaceRepo(IConfiguration configuration, IMSMQService mSMQService)
         {
             this.configuration = configuration;
             this.connectionString = configuration.GetConnectionString("UserDbConnection");
             this.connection = new SqlConnection(this.connectionString);
+            this.mSMQService = mSMQService;
         }
 
         public List<PlaceOrderResponse> GetOrderPlace(int userId)
@@ -81,7 +84,12 @@ namespace BookStoreRepositoryLayer.Repository
                     command.Connection.Open();
                     int result = command.ExecuteNonQuery();
                     if (result != 0)
+                    {
+                        string email = getEmailAddress(placeOrder.UserId);
+                        this.mSMQService.AddToQueue(email);
                         return placeOrder;
+                    }
+                        
                     return null;
                 }
             }
@@ -93,6 +101,40 @@ namespace BookStoreRepositoryLayer.Repository
             {
                 this.connection.Close();
             }
+        }
+
+        public string getEmailAddress(int userId)
+        {
+            SqlCommand command = new SqlCommand("spGetEmailAddress", this.connection);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@UserId", userId);
+            string Email = "";
+            this.connection.Open();
+            SqlDataReader dataReader = command.ExecuteReader();
+            while (dataReader.Read())
+            {
+                if (dataReader != null)
+                {
+                    Email = dataReader["Email"].ToString();
+                    break;
+                }
+            }
+            return Email;
+            //try
+            //{
+            //    using (this.connection)
+            //    {
+
+            //    }
+            //}
+            //catch(Exception e)
+            //{
+            //    throw new Exception(e.Message);
+            //}
+            //finally
+            //{
+            //    this.connection.Close();
+            //}
         }
     }
 }
